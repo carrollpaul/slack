@@ -15,8 +15,8 @@ def getHoliday():
         'Mar' : 'https://foodimentary.com/today-in-national-food-holidays/march-food-holidays/',
         'Apr' : 'https://foodimentary.com/today-in-national-food-holidays/april-food-holidays-foodimentary/',
         'May' : 'https://foodimentary.com/today-in-national-food-holidays/may-holidays/',
-        'June': 'https://foodimentary.com/june-holidays/',
-        'July': 'https://foodimentary.com/july-holidays/',
+        'Jun' : 'https://foodimentary.com/june-holidays/',
+        'Jul' : 'https://foodimentary.com/july-holidays/',
         'Aug' : 'https://foodimentary.com/august-holidays/',
         'Sept': 'https://foodimentary.com/september-holidays/',
         'Oct' : 'https://foodimentary.com/october-holidays/',
@@ -25,17 +25,9 @@ def getHoliday():
     }
 
     # Get HTML from home page
-    url = 'https://foodimentary.com/today-in-national-food-holidays/todayinfoodhistorycalenderfoodnjanuary/'
+    url = URL_LOOKUP.get(month)
     r = requests.get(url)
     soup = BeautifulSoup(r.text, 'html.parser') # Parse HTML with BeautifulSoup
-
-    # Get the current month URL
-    months = soup.find('ul', id='menu-months', class_='menu') # Isolate the months table
-    monthUrl = months.find('a', href=True, string=month)['href'] # Get the month URL for the current month
-
-    # Get HTML from month page, parse
-    r = requests.get(monthUrl)
-    soup = BeautifulSoup(r.text, 'html.parser')
 
     # Find tag with URL that contains formatted date
     holidayTag = soup.select_one(f'a[href*={fDate}]')
