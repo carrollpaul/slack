@@ -52,8 +52,8 @@ def main():
     # POST payload
     postData = {
         'token'   : f'{config.apiToken}',
-        'channel' : f'{config.channelId}',
-        'topic'   : f"Happy {holiday} ({fDate})"
+        'channel' : f'{config.practiceChannelId}',
+        'topic'   : f"Happy {holiday}! ({fDate})"
     }
 
     p = requests.post(postUrl, data = postData)
