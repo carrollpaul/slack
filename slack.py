@@ -1,60 +1,59 @@
 import requests
 import re
 import config
-from datetime import date
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 def getHoliday():
-    month = date.today().strftime('%b') # Get month
-    day = date.today().strftime('%d') # Get day
-    fDate = f'{month.lower()}-{day}' # Format date 
+    month = datetime.now().strftime('%B') # Get full month (ex. February 01)
+    currentDay = datetime.now().day # Get day
+    fDate = f'{month} {currentDay}' # Format date
 
     URL_LOOKUP = {
-        'Jan' : 'https://foodimentary.com/today-in-national-food-holidays/todayinfoodhistorycalenderfoodnjanuary/',
-        'Feb' : 'https://foodimentary.com/today-in-national-food-holidays/february-food-holidays/',
-        'Mar' : 'https://foodimentary.com/today-in-national-food-holidays/march-food-holidays/',
-        'Apr' : 'https://foodimentary.com/today-in-national-food-holidays/april-food-holidays-foodimentary/',
-        'May' : 'https://foodimentary.com/today-in-national-food-holidays/may-holidays/',
-        'Jun' : 'https://foodimentary.com/june-holidays/',
-        'Jul' : 'https://foodimentary.com/july-holidays/',
-        'Aug' : 'https://foodimentary.com/august-holidays/',
-        'Sept': 'https://foodimentary.com/september-holidays/',
-        'Oct' : 'https://foodimentary.com/october-holidays/',
-        'Nov' : 'https://foodimentary.com/november-holidays/',
-        'Dec' : 'https://foodimentary.com/today-in-national-food-holidays/december-national-food-holidays/'
+        'January'  : 'https://foodimentary.com/today-in-national-food-holidays/todayinfoodhistorycalenderfoodnjanuary/',
+        'February' : 'https://foodimentary.com/today-in-national-food-holidays/february-food-holidays/',
+        'March'    : 'https://foodimentary.com/today-in-national-food-holidays/march-food-holidays/',
+        'April'    : 'https://foodimentary.com/today-in-national-food-holidays/april-food-holidays-foodimentary/',
+        'May'      : 'https://foodimentary.com/today-in-national-food-holidays/may-holidays/',
+        'June'     : 'https://foodimentary.com/june-holidays/',
+        'July'     : 'https://foodimentary.com/july-holidays/',
+        'August'   : 'https://foodimentary.com/august-holidays/',
+        'September': 'https://foodimentary.com/september-holidays/',
+        'October'  : 'https://foodimentary.com/october-holidays/',
+        'November' : 'https://foodimentary.com/november-holidays/',
+        'December' : 'https://foodimentary.com/today-in-national-food-holidays/december-national-food-holidays/'
     }
 
-    # Get HTML from home page
-    url = URL_LOOKUP.get(month)
+    # Get HTML from month page
+    url = URL_LOOKUP.get(month) # Lookup month URL
     r = requests.get(url)
-    soup = BeautifulSoup(r.text, 'html.parser') # Parse HTML with BeautifulSoup
+    soup = BeautifulSoup(r.content, 'html.parser') # Parse HTML with BeautifulSoup
+    text = soup.select_one('section[role="main"]').text
 
-    # Find tag with URL that contains formatted date
-    holidayTag = soup.select_one(f'a[href*={fDate}]')
-    # Navigate HTML tree to get chunk that contains National Holiday
-    descendants = holidayTag.parent.parent.descendants
+    # Make a dictionary of dates and lists of Food Holidays 
+    out = {}
+    for day, names in re.findall(r'^([A-Z][^\n]+\d\s*)$(.*?)\n\n', text, flags=re.DOTALL|re.M): # Regex courtesy of Stack Overflow
+        out[day.strip()] = [name.replace('\xa0', ' ') for name in names.strip().split('\n')]
 
-    for child in descendants: # Iterate through all nested tags
-        try:
-            if 'National' in child.string: # If tag contains a string AND the word National, grab the string
-                holiday = child.string
-                break
-        except:
-            continue
-    
-    return holiday
+    # Get holiday for current day
+    currentHoliday = out.get(fDate)[0]
+
+    return currentHoliday
 
 def main():
     postUrl = 'https://slack.com/api/conversations.setTopic' # Slack API endpoint URL
 
     holiday = getHoliday() # Get name of today's holiday
-    today = date.today().strftime('%b %d') # Get formatted date
+
+    month = datetime.now().strftime('%B') # Get full month (ex. February 01)
+    currentDay = datetime.now().day # Get day
+    fDate = f'{month} {currentDay}' # Format date
 
     # POST payload
     postData = {
         'token'   : f'{config.apiToken}',
         'channel' : f'{config.channelId}',
-        'topic'   : f"Happy {holiday} ({today})"
+        'topic'   : f"Happy {holiday} ({fDate})"
     }
 
     p = requests.post(postUrl, data = postData)
