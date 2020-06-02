@@ -9,6 +9,21 @@ def getHoliday():
     day = date.today().strftime('%d') # Get day
     fDate = f'{month.lower()}-{day}' # Format date 
 
+    URL_LOOKUP = {
+        'Jan' : 'https://foodimentary.com/today-in-national-food-holidays/todayinfoodhistorycalenderfoodnjanuary/',
+        'Feb' : 'https://foodimentary.com/today-in-national-food-holidays/february-food-holidays/',
+        'Mar' : 'https://foodimentary.com/today-in-national-food-holidays/march-food-holidays/',
+        'Apr' : 'https://foodimentary.com/today-in-national-food-holidays/april-food-holidays-foodimentary/',
+        'May' : 'https://foodimentary.com/today-in-national-food-holidays/may-holidays/',
+        'June': 'https://foodimentary.com/june-holidays/',
+        'July': 'https://foodimentary.com/july-holidays/',
+        'Aug' : 'https://foodimentary.com/august-holidays/',
+        'Sept': 'https://foodimentary.com/september-holidays/',
+        'Oct' : 'https://foodimentary.com/october-holidays/',
+        'Nov' : 'https://foodimentary.com/november-holidays/',
+        'Dec' : 'https://foodimentary.com/today-in-national-food-holidays/december-national-food-holidays/'
+    }
+
     # Get HTML from home page
     url = 'https://foodimentary.com/today-in-national-food-holidays/todayinfoodhistorycalenderfoodnjanuary/'
     r = requests.get(url)
