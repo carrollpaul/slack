@@ -51,8 +51,8 @@ def main():
 
     # POST payload
     postData = {
-        'token'   : f'{config.apiToken}',
-        'channel' : f'{config.practiceChannelId}',
+        'token'   : f'{config.foodieApiToken}',
+        'channel' : f'{config.foodieChannelId}',
         'topic'   : f"Happy {holiday}! ({fDate})"
     }
 
