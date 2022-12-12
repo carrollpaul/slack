@@ -32,7 +32,7 @@ def getHoliday():
 
     # Make a dictionary of dates and lists of Food Holidays 
     out = {}
-    for day, names in re.findall(r'^([A-Z][^\n]+\d\s*)$(.*?)\n\n', text, flags=re.DOTALL|re.M): # Regex courtesy of Stack Overflow
+    for day, names in re.findall(r'^([A-Z][^\n]+\d\s*)$(.*?)\n\n', text, flags=re.DOTALL|re.M):
         out[day.strip()] = [name.replace('\xa0', ' ') for name in names.strip().split('\n')]
 
     # Get holiday for current day
